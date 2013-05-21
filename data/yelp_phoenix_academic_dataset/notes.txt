@@ -1,0 +1,13 @@
+Yelp Phoenix Academic Dataset (3-11-13)
+
+Please read the included Phoenix Academic Dataset Agreement before continuing.
+
+For more information please go to:
+http://www.yelp.com/dataset_challenge
+and check out
+https://github.com/Yelp/dataset-examples
+
+If you are interested in careers at Yelp please check out:
+http://www.yelp.com/careers
+and our dataset related Kaggle competition
+https://www.kaggle.com/c/yelp-recruiting
