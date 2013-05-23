@@ -6,6 +6,8 @@ from util import *
 CHUNK_SIZE = 20000
 
 def combine_multi_words(sentence, multiword_attrs):
+  """Groups noun compounds and bigrams identified as multi-word attributes
+  together to be treated as a single unit by the parser"""
   token_tag_pairs = []
   last_tag = lastToken = None
   last_TAT = ''
@@ -29,16 +31,17 @@ def combine_multi_words(sentence, multiword_attrs):
       token_tag_pairs.append((token, tag))
 
     (last_tag, lastToken, last_TAT) = (tag, token, TAT)
-  
+
   res = ''
   for (token, tag) in token_tag_pairs:
     res += token + '/' + tag + ' '
   return res[:-1]
 
 def pre_parse():
+  """Prepares the review text for parsing"""
   multiword_attrs = set((a, b) for [a, b] \
     in load_json('./data/multiword_attributes.json')["multiword_attributes"])
- 
+
   written_sentences = CHUNK_SIZE + 1
   out = None
   outfile_num = 0

@@ -1,4 +1,4 @@
-import java.io.BufferedReader;
+mport java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
@@ -12,8 +12,11 @@ import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.process.PTBTokenizer;
 
+/**
+ *  Runs the Stanford POS Tagger over the files in the provided directory
+ *  Outputs both the tagged sentences and sentence-tokenized sentences
+ */
 class Tagger {
-
   public static void main(String[] args) throws Exception {
     if (args.length != 4) {
       System.err.println("usage: java Tagger reviewsDir taggedDir untaggedDir");
@@ -25,11 +28,10 @@ class Tagger {
     File dir = new File(args[1]);
     String[] children = dir.list();
     if (children == null) {
-      System.out.println("No such directory: " + args[1]);
       // Either dir does not exist or is not a directory
+      System.out.println("No such directory: " + args[1]);
     } else {
       for (int i=0; i<children.length; i++) {
-        // Get filename of file or directory
         String filepath = args[1] + '/' + children[i];
         BufferedWriter out = new BufferedWriter(new FileWriter(args[2] + '/' + children[i]));
         BufferedWriter out2 = new BufferedWriter(new FileWriter(args[3] + '/' + children[i]));

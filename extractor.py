@@ -10,6 +10,8 @@ import extraction_filterer
 import polarity_computer
 
 def run_extractor():
+  """Run the full extraction pipeline"""
+  
   subprocess.call('mkdir data/reviews', shell=True)
   subprocess.call('mkdir data/tagged', shell=True)
   subprocess.call('mkdir data/untagged', shell=True)
@@ -17,10 +19,10 @@ def run_extractor():
   subprocess.call('mkdir data/parsed/', shell=True)
   
   preprocessor.preprocess()
-
+  
   subprocess.call('javac -cp ./external/stanford-postagger.jar Tagger.java', shell=True)
   subprocess.call('java -cp ".:./external/stanford-postagger.jar" -Xmx1024m Tagger ./external/left3words-wsj-0-18.tagger data/reviews data/tagged data/untagged', shell=True)
-
+  
   multiword_attr_identifier.identify_multiword_attrs()
   parser_preparation.pre_parse()
   parser.parse_parallel(4)

@@ -16,8 +16,8 @@ attr_value_ratios = {}
 attr_counts = {}
 value_counts = {}
 
-# Returns the Kullback-Leibler divergence between the two distributions
 def KL_divergence(value_counts1, value_counts2):
+  """Returns the Kullback-Leibler divergence between the two distributions"""
   divergence = 0
   s1 = sum([value_counts1[value] for value in value_counts1])
   s2 = sum([value_counts2[value] for value in value_counts2])
@@ -40,8 +40,10 @@ def KL_divergence(value_counts1, value_counts2):
     divergence = math.e
   return divergence
 
-# Computes some useful statistics about the attributes in common_extractions
 def load_attribute_data():
+  """Computes some useful statistics about the attributes in 
+  common_extractions
+  """
   global attr_value_counts, attr_counts, value_counts, \
     attr_value_ratios, attrs
 
@@ -69,8 +71,8 @@ def load_attribute_data():
 
 distances = {}
 symmetric_distances = {}
-# Loads the distances between each pair of attributes
 def load_distances(filename):
+  """Loads the distances between each pair of attributes"""
   global distances, symmetric_distances, attrs
 
   print "Loading distances from " + filename + "..."
@@ -85,8 +87,8 @@ def load_distances(filename):
     symmetric_distances[p][p] = 0
   attrs = distances.keys()
 
-# Computes the distance between each pair of attributes using KL divergence
 def write_distances(filename):
+  """Computes the distance between each pair of attributes using KL divergence"""
   print "Computing distances and writing to " + filename +  "..."
   distances = {}
   n = 0
@@ -102,22 +104,18 @@ def write_distances(filename):
   with open(filename, 'w') as f:
     f.write(json.dumps(distances))
 
-# Helper method, returns the min value and argmin of f in a tuple
-def min_argmin(f, args):
-  return min((f(a), a) for a in args)
-
-# Returns the average distance between the two sets of attributes
 def average_distance(c1, c2):
+  """Returns the average distance between the two sets of attributes"""
   return sum(sum(symmetric_distances[p1][p2] for p1 in c1) for p2 in c2) \
          / (len(c1) * len(c2))
 
-# Sort the attributes in each cluster by how "central" they are
 def sorted_clusters(clusters, distance_function):
- return [sorted([p for p in c], key = lambda p:
+  """Sort the attributes in each cluster by how "central" they are"""
+  return [sorted([p for p in c], key = lambda p:
      distance_function(set([p]), c)) for c in clusters]
 
-# Iteratively cluster the points into the clusters using the distance function
 def iterative_cluster(clusters, points, distance_function, max_iterations=1000):
+  """Iteratively cluster points into clusters using the distance function"""
   point_assignments = {p: 0 for p in points}
 
   for p in points:
@@ -153,8 +151,8 @@ abbreviation_mapping = {
   'd': 'Decor', 'o': 'Overall'}
 
 category_distances = NestedDict()
-# Categorize the attributes according to the seeds
 def categorize(seeds):
+  """Categorize the attributes according to the seeds"""
   global category_distances
   attr_by_category = {c: [] for c in seeds}
     
@@ -172,8 +170,8 @@ def categorize(seeds):
 
 attr_categories = {}
 seeds = {}
-# Categorize all the attributes
 def categorize_attributes():
+  """Categorize all the attributes"""
   global attr_categories, seeds
   print "Generating seeds..."
   seeds = get_seeds()
@@ -188,16 +186,18 @@ def categorize_attributes():
       attr_categories[attr] = c
       category_distances[attr] = score
 
-# Compute the seeds for each category using a clustering algorithm
 def get_seeds():
-  num_clusters = {'Food': 3, 'Decor': 4, 'Service': 4, 
-                  'Overall': 3, 'None': 6}
+  """Compute seeds for each category using a clustering algorithm"""
+  num_clusters = {'Food': 5, 'Decor': 5, 'Service': 5, 
+                  'Overall': 5, 'None': 10}
 
   e, y = get_labeled_data('./data/labeled_attributes/develop_set')
   clusters = [set() for i in range(len(category_mapping))]
   for i in range(len(e)):
     clusters[y[i]].add(e[i])
 
+  # In order to pick seeds that cover each category well, cluster the labeled 
+  # attrs in each category and take the centers of those clusters as seeds
   seeds = {}
   for i in range(len(clusters)):
     category = inverse_category_mapping[i]
@@ -209,8 +209,8 @@ def get_seeds():
 
   return seeds
 
-# Evaluate out classification against the test set
 def evaluate(attr_categories, print_errors=True):
+  """Evaluate our classification against the test set"""
   e, y = get_labeled_data('./data/labeled_attributes/test_set')
  
   errors = []
@@ -234,8 +234,8 @@ def evaluate(attr_categories, print_errors=True):
   print "Precision = Recall = f1 = " + \
     str(float(sum([1 for i in range(len(y)) if y[i] == p[i]])) / len(y))
 
-# Load a list of examples and their labels for the given file
 def get_labeled_data(filename):
+  """Load a list of examples and their labels for the given file"""
   e = []
   y = []
   with open(filename) as f:
@@ -245,8 +245,9 @@ def get_labeled_data(filename):
   return e, y
 
 def run_categorizer():
+  """Runs attribute classification"""
   load_attribute_data()
-  write_distances('./data/attr_KL_divergences.json')
+  #write_distances('./data/attr_KL_divergences.json')
   load_distances('./data/attr_KL_divergences.json')
   categorize_attributes()
 
@@ -265,4 +266,3 @@ if __name__ == '__main__':
   print "UNSUPERVISED CLUSTERING RESULTS:"
   evaluate(attr_categories)
   print 80 * '='
-  print attr_categories

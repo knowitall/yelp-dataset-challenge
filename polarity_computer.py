@@ -5,6 +5,9 @@ REVIEW_DATA_FILE = './data/yelp_phoenix_academic_dataset/' + \
                    'yelp_academic_dataset_review.json'
 
 def compute_polarities():
+  """Compute the polarity of each value in the final extraction set by
+  averaging the stars of all reviews that value appeared in
+  """
   stars = {}
   for review_data in load_json_lines(REVIEW_DATA_FILE):
     stars[review_data['review_id']] = float(review_data['stars'])

@@ -13,8 +13,8 @@ from sklearn import metrics
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 from sklearn.feature_extraction import DictVectorizer
 
-# Returns the features for the given attribute in a dictionary
 def get_features(attr, common_values):
+  """Returns the features for the given attribute in a dictionary"""
   features = {}
   common_count = 1
   for value, c in common_values:
@@ -27,11 +27,11 @@ def get_features(attr, common_values):
   # Relative frequency of the most common associated adjectives
   for value, c in common_values:
     features[value] = float(features[value]) / common_count
-    
+
   # Total number of extractions with this noun
   features['total_count'] = attr_counts[attr]
 
-  # What percentage of the extractions with this noun occur with the common 
+  # What percentage of the extractions with this noun occur with the common
   # adjectives
   features['count_ratio'] = float(common_count) / attr_counts[attr]
 
@@ -41,26 +41,27 @@ def get_features(attr, common_values):
 
   return features
 
-# Runs the given classifier over the whole data set
 def classify_all(clf, X, examples):
+  """Runs the given classifier over the whole data set"""
   p = clf.predict(X)
   for i in range(len(examples)):
     attr_categories[examples[i]] = inverse_category_mapping[p[i]]
 
-# Get the features and labels from the given file
 def X_y(filename, feature_dicts, vectorizer, examples):
+  """Get the features and labels from the given file"""
   e, y = get_labeled_data(filename)
   X = vectorizer.transform([feature_dicts[examples.index(ex)] for ex in e])
   return X, y
 
 feature_dicts = {}
 def classify():
+  """Classify all attrs"""
   run_categorizer()
 
   # Find the most common values for features
   common_values = set(sorted( \
     value_counts.items(), key=itemgetter(1), reverse=True)[:40])
- 
+
   # Compute the features
   feature_dicts = []
   examples = list(attrs)
@@ -70,7 +71,7 @@ def classify():
   X = vectorizer.fit_transform(feature_dicts)
 
   # Gather the training data and train a random forest classifier on it
-  X_train, y_train = X_y('./data/labeled_attributes/develop_set', 
+  X_train, y_train = X_y('./data/labeled_attributes/develop_set',
                          feature_dicts, vectorizer, examples)
   clf = ExtraTreesClassifier(n_estimators=100)
   clf.fit(X_train, y_train)
@@ -92,12 +93,12 @@ def classify():
   evaluate(attr_categories)
   print 80 * '='
 
-  # Use the hand labels when available 
+  # Use the hand labels when available
   e, y = get_labeled_data('./data/labeled_attributes/develop_set')
   e_test, y_test = get_labeled_data('./data/labeled_attributes/test_set')
   e.extend(e_test)
   y.extend(y_test)
-  
+
   for target, attr in zip(y, e):
     attr_categories[attr] = inverse_category_mapping[target]
 

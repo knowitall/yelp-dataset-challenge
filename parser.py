@@ -10,10 +10,11 @@ OUT_DIR = './data/parsed'
 OUT_NAME = 'parsed'
 TMP_NAME = 'tmp'
 
-# Runs the parser on the remaining files in to_parse
-# There is an extra step of creating a temporary file so if we halt the 
-# program, the partial work the parser has done on a given file is thrown out
 def parse(completed, lock):
+  """Runs the parser mogura on the remaining files in to_parse
+  There is an extra step of creating a temporary file so if we halt the
+  program, the partial work the parser has done on a given file is thrown out
+  """
   while True: # bit of a hack, hangs forever when parsing is done
     for infilename in os.listdir(IN_DIR):
       infile = IN_DIR + '/' + infilename
@@ -26,14 +27,14 @@ def parse(completed, lock):
         if outname in completed:
           continue
         completed[outname] = 0
-      
+
       print "ON FILE " + infilename
       subprocess.call('./external/mogura -nt < '
                       + infile + ' > ' + tmpfile, shell=True)
       subprocess.call('mv ' + tmpfile + ' ' + outfile, shell=True)
 
-# Runs parse on four separate processes
 def parse_parallel(num_processes):
+  """Runs parse on num_processes separate processes"""
   manager = Manager()
 
   completed = manager.dict()
